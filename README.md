@@ -24,19 +24,10 @@ This project demonstrates an end-to-end data pipeline for ingesting and transfor
 
 ## Data Modelling
   We use STAR Schema data modelling where whole data is divided into dimensions and fact table. 
+
+  ![Data Modelling](https://github.com/chandravamshi-ai/tc_tb_ETL-Pipeline-using-Astro-Airflow-DBT-Postgres/blob/main/imgs/data_modelling.png)
   
-  Below is a simplified diagram illustrating the dimensional model:
-  
-  ```
-          passenger_count_dim       trip_distance_dim      rate_code_dim
-                   |                      |                      |
-                   v                      v                      v
-                           +---------------------------+
-                           |         fact_table        |
-                           +---------------------------+
-                   |                      |                      |
-          payment_type_dim     pickup_location_dim     datetime_dim
-  ```
+
 
  ## Project Structure
  
