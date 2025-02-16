@@ -1,0 +1,282 @@
+version: 2
+
+models:
+  - name: dim_datetime
+    description: >
+      DateTime Dimension.
+      This model extracts time-related attributes from pickup and dropoff timestamps
+      from the staging table `stg_uber_data`. A surrogate key `datetime_id` is derived from the unique `trip_id`.
+    columns:
+      - name: datetime_id
+        description: "Surrogate key derived from the unique trip_id."
+        tests:
+          - unique
+          - not_null
+
+      - name: tpep_pickup_datetime
+        description: "The original pickup timestamp."
+        tests:
+          - not_null
+
+      - name: pickup_hour
+        description: "Hour extracted from the pickup timestamp (0-23)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+
+      - name: pickup_day
+        description: "Day of the month extracted from the pickup timestamp (typically 1-31)."
+        tests:
+          - not_null
+
+      - name: pickup_weekday
+        description: "Day of the week extracted from the pickup timestamp (0 = Sunday to 6 = Saturday)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1, 2, 3, 4, 5, 6]
+
+      - name: pickup_month
+        description: "Month extracted from the pickup timestamp (1-12)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+
+      - name: pickup_year
+        description: "Year extracted from the pickup timestamp."
+        tests:
+          - not_null
+
+      - name: tpep_dropoff_datetime
+        description: "The original dropoff timestamp."
+        tests:
+          - not_null
+
+      - name: dropoff_hour
+        description: "Hour extracted from the dropoff timestamp (0-23)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+
+      - name: dropoff_day
+        description: "Day of the month extracted from the dropoff timestamp (typically 1-31)."
+        tests:
+          - not_null
+
+      - name: dropoff_weekday
+        description: "Day of the week extracted from the dropoff timestamp (0 = Sunday to 6 = Saturday)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 1, 2, 3, 4, 5, 6]
+
+      - name: dropoff_month
+        description: "Month extracted from the dropoff timestamp (1-12)."
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+
+      - name: dropoff_year
+        description: "Year extracted from the dropoff timestamp."
+        tests:
+          - not_null
+
+
+  - name: dim_dropoff_location
+    description: "Dimension table capturing dropoff location details."
+    columns:
+      - name: dropoff_location_id
+        description: "A surrogate key assigned from the unique trip_id."
+        tests:
+          - unique
+          - not_null
+
+      - name: dropoff_longitude
+        description: "Longitude coordinate of the dropoff location."
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: -180
+              max_value: 180
+
+      - name: dropoff_latitude
+        description: "Latitude coordinate of the dropoff location."
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: -90
+              max_value: 90
+  
+
+  - name: dim_passenger_count
+    description: "Dimension table capturing the passenger count for each trip."
+    columns:
+      - name: passenger_count_id
+        description: "A surrogate key assigned from the unique trip_id."
+        tests:
+          - unique
+          - not_null
+
+      - name: passenger_count
+        description: "The number of passengers in the trip."
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              max_value: 10  # a reasonable range of passengers in the Uber context
+
+
+  - name: dim_payment_type
+    description: "Dimension table mapping payment type codes to descriptive names."
+    columns:
+      - name: payment_type_id
+        description: "A surrogate key assigned from the unique trip_id."
+        tests:
+          - unique
+          - not_null
+
+      - name: payment_type
+        description: "The numeric payment type code."
+        tests:
+          - not_null
+          - accepted_values:
+              values: [1, 2, 3, 4, 5, 6]
+
+      - name: payment_type_name
+        description: "Descriptive payment type based on the payment_type code."
+        tests:
+          - not_null
+
+  
+  - name: dim_pickup_location
+    description: "Dimension table capturing the pickup location coordinates."
+    columns:
+      - name: pickup_location_id
+        description: "A surrogate key assigned from the unique trip_id."
+        tests:
+          - unique
+          - not_null
+
+      - name: pickup_longitude
+        description: "Longitude of the pickup location."
+        tests:
+          - not_null
+
+      - name: pickup_latitude
+        description: "Latitude of the pickup location."
+        tests:
+          - not_null
+
+  - name: dim_rate_code
+    description: "Dimension table mapping RatecodeID to descriptive rate code names."
+    columns:
+      - name: rate_code_id
+        description: "A surrogate key assigned from the unique trip_id."
+        tests:
+          - unique
+          - not_null
+
+      - name: RatecodeID
+        description: "Rate code identifier for the trip."
+        tests:
+          - not_null
+
+      - name: rate_code_name
+        description: "Descriptive name of the rate code."
+        tests:
+          - not_null
+
+  - name: dim_trip_distance
+    description: "Dimension table capturing the trip distance for each trip."
+    columns:
+      - name: trip_distance_id
+        description: "A surrogate key assigned from the unique trip_id."
+        tests:
+          - unique
+          - not_null
+
+      - name: trip_distance
+        description: "The distance traveled during the trip."
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0
+              strictly: false
+
+  
+  - name: fact_trips
+    description: "Fact table containing all trip details with foreign key references to dimension tables."
+    columns:
+      - name: trip_id
+        description: "Primary key representing each trip."
+        tests:
+          - unique
+          - not_null
+
+      - name: VendorID
+        description: "Vendor providing the trip service."
+        tests:
+          - not_null
+
+      - name: datetime_id
+        description: "Foreign key reference to `dim_datetime`."
+        tests:
+          - relationships:
+              to: ref('dim_datetime')
+              field: datetime_id
+
+      - name: passenger_count_id
+        description: "Foreign key reference to `dim_passenger_count`."
+        tests:
+          - relationships:
+              to: ref('dim_passenger_count')
+              field: passenger_count_id
+
+      - name: trip_distance_id
+        description: "Foreign key reference to `dim_trip_distance`."
+        tests:
+          - relationships:
+              to: ref('dim_trip_distance')
+              field: trip_distance_id
+
+      - name: pickup_location_id
+        description: "Foreign key reference to `dim_pickup_location`."
+        tests:
+          - relationships:
+              to: ref('dim_pickup_location')
+              field: pickup_location_id
+
+      - name: dropoff_location_id
+        description: "Foreign key reference to `dim_dropoff_location`."
+        tests:
+          - relationships:
+              to: ref('dim_dropoff_location')
+              field: dropoff_location_id
+
+      - name: rate_code_id
+        description: "Foreign key reference to `dim_rate_code`."
+        tests:
+          - relationships:
+              to: ref('dim_rate_code')
+              field: rate_code_id
+
+      - name: payment_type_id
+        description: "Foreign key reference to `dim_payment_type`."
+        tests:
+          - relationships:
+              to: ref('dim_payment_type')
+              field: payment_type_id
+
+      - name: fare_amount
+        description: "Total fare charged for the trip."
+        tests:
+          - not_null
+
+      - name: total_amount
+        description: "Final total amount paid for the trip, including additional charges."
+        tests:
+          - not_null

@@ -1,0 +1,9 @@
+# sources.yml
+version: 2
+
+sources:
+  - name: raw
+    database: postgres      
+    schema: raw
+    tables:
+      - name: uber_data

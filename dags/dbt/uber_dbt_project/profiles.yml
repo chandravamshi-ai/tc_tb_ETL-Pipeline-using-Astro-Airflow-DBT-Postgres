@@ -1,0 +1,12 @@
+uber_dbt_project:
+  outputs:
+    dev:
+      dbname: postgres
+      host: tc-etl_449df6-postgres-1
+      pass: postgres
+      port: 5432
+      schema: transformed
+      threads: 1
+      type: postgres
+      user: postgres
+  target: dev

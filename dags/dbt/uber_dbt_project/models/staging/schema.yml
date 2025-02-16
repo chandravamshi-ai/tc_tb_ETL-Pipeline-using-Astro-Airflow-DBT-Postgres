@@ -1,0 +1,44 @@
+version: 2
+
+models:
+  - name: stg_uber_data
+    description: "This staging model selects data from the raw source table 'uber_data'. It serves as the base for our transformations."
+    columns:
+      - name: trip_id
+        description: "Unique identifier for each trip."
+      - name: VendorID
+        description: "Identifier for the vendor associated with the trip."
+      - name: tpep_pickup_datetime
+        description: "Timestamp when the trip's pickup occurred."
+      - name: tpep_dropoff_datetime
+        description: "Timestamp when the trip's dropoff occurred."
+      - name: passenger_count
+        description: "Number of passengers for the trip."
+      - name: trip_distance
+        description: "Distance traveled during the trip."
+      - name: pickup_longitude
+        description: "Longitude coordinate of the pickup location."
+      - name: pickup_latitude
+        description: "Latitude coordinate of the pickup location."
+      - name: dropoff_longitude
+        description: "Longitude coordinate of the dropoff location."
+      - name: dropoff_latitude
+        description: "Latitude coordinate of the dropoff location."
+      - name: RatecodeID
+        description: "Rate code identifier used to determine fare pricing."
+      - name: payment_type
+        description: "Method of payment used for the trip."
+      - name: fare_amount
+        description: "Base fare amount for the trip."
+      - name: extra
+        description: "Additional charges applied to the fare."
+      - name: mta_tax
+        description: "Tax imposed by the MTA."
+      - name: tip_amount
+        description: "Tip amount provided by the passenger."
+      - name: tolls_amount
+        description: "Total toll charges incurred during the trip."
+      - name: improvement_surcharge
+        description: "Additional surcharge for service improvements."
+      - name: total_amount
+        description: "Total amount charged for the trip, including all fees and surcharges."
