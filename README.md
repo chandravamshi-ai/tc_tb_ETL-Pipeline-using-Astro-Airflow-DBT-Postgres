@@ -9,7 +9,7 @@ This project demonstrates an end-to-end data pipeline for ingesting and transfor
 ## Data Sources
 - **Official NYC TLC Trip Record Data**: [NYC TLC Website](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page)  
 - **Data Dictionary**: [NYC TLC Data Dictionary](https://www.nyc.gov/assets/tlc/downloads/pdf/data_dictionary_trip_records_yellow.pdf)  
-- **CSV**: [uber_data.csv on GitHub]([https://github.com/katiehuangx/data-engineering/blob/main/Uber%20Project/uber_data.csv](https://github.com/chandravamshi-ai/Data-Engineering-and-Analysis/blob/main/Uber%20Data%20Engineering%20%2C%20Analysis%20and%20Visualization/uber_data.csv))
+- **CSV**: [uber_data.csv on GitHub]((https://github.com/chandravamshi-ai/Data-Engineering-and-Analysis/blob/main/Uber%20Data%20Engineering%20%2C%20Analysis%20and%20Visualization/uber_data.csv)
 
 ## Architecture
 1. **Raw Data Ingestion**  
