@@ -99,7 +99,7 @@ def execute_batch_insert(df, schema_name, table_name, batch_size=1000):
         # Insert in batches
         for i in range(0, len(data), batch_size):
             batch = data[i:i + batch_size]
-            # Correct usage of execute_values:
+            
             cursor.executemany(insert_query, batch)
             conn.commit()
             logger.info(f"Inserted {len(batch)} rows into {schema_name}.{table_name}")
