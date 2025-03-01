@@ -2,12 +2,15 @@
 Configuration file for database connection and data source.
 """
 
+
+DB_DEFAULT_CONN_ID = "postgres_default"
 # -----------------------------------------------------------------------------
 # Extract-Transform-Load Configuration
 # -----------------------------------------------------------------------------
 CSV_URL = "https://raw.githubusercontent.com/chandravamshi-ai/Data-Engineering-and-Analysis/main/Uber%20Data%20Engineering%20%2C%20Analysis%20and%20Visualization/uber_data.csv"
 RAW_SCHEMA = "raw"
 RAW_TABLE = "uber_data"
+BATCH_SIZE = 1000
 # -----------------------------------------------------------------------------
 # DBT Transformation Configuration
 # -----------------------------------------------------------------------------

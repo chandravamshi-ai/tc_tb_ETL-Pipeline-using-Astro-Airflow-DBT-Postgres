@@ -1,12 +1,15 @@
 import logging
 import pandas as pd
 from airflow.providers.postgres.hooks.postgres import PostgresHook
+from psycopg2.extras import execute_values
+from scripts.config import BATCH_SIZE
+from scripts.config import DB_DEFAULT_CONN_ID
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-def get_postgres_connection(conn_id: str = "postgres_default"):
+def get_postgres_connection(conn_id: str = DB_DEFAULT_CONN_ID):
     """
     Returns a Postgres connection and cursor using Airflow's PostgresHook.
     
@@ -35,9 +38,72 @@ def close_connection(conn, cursor):
         if conn:
             conn.close()
     except Exception as e:
-        logger.warning(f"Error closing connection: {e}")
+        logger.error(f"Error closing connection: {e}")
+        raise
 
-def execute_sql(sql: str, conn_id: str = "postgres_default"):
+
+def execute_batch_insert(df, schema_name, table_name):
+    """
+    Inserts a DataFrame into PostgreSQL using batch insert.
+
+    :param df: Pandas DataFrame containing the data
+    :param table_name: Target PostgreSQL table
+    :param schema_name: Schema name for the table
+    :param batch_size: Number of rows per batch insert
+    """
+    if df.empty:
+        raise ValueError("❌ The DataFrame is empty. Upload aborted.")
+
+    try:
+        # Get PostgreSQL connection using PostgresHook
+        conn, cursor = get_postgres_connection()
+
+        # Replace NaN values with None in place to avoid memory overhead
+        df.where(pd.notna(df), None, inplace=True)
+
+        # Prepare the columns and values template
+        df['trip_id'] = df.index
+        
+        # Prepare the list of columns
+        columns = ",".join(df.columns)
+        
+        # Prepare the insert query
+        insert_query = f"INSERT INTO {schema_name}.{table_name} ({columns}) VALUES %s"
+        
+        
+        # Process data in batches using generator
+        for batch in batch_generator(df):
+            execute_values(cursor, insert_query, batch, page_size=BATCH_SIZE)
+            logger.info(f"Inserted a batch of {len(batch)} rows")
+
+        # Commit **once** after all batches have been processed (atomic transaction)
+        conn.commit()
+        logger.info(f"✅ Successfully uploaded entire DataFrame to {schema_name}.{table_name}")
+
+    except Exception as e:
+        logger.error(f"❌ Error uploading DataFrame to {schema_name}.{table_name}: {e}")
+        if conn:
+            conn.rollback()
+        raise
+    finally:
+        close_connection(conn, cursor)        
+
+
+def batch_generator(df):
+    """
+    Generator that yields batches of rows from the DataFrame using itertuples.
+    """
+    batch = []
+    for row in df.itertuples(index=False, name=None):
+        batch.append(row)
+        if len(batch) == BATCH_SIZE:
+            yield batch
+            batch = []
+    if batch:  # Yield remaining rows if any
+        yield batch
+          
+        
+def execute_sql(sql: str, conn_id: str = DB_DEFAULT_CONN_ID):
     """
     Executes a given SQL statement with error handling.
     
@@ -54,61 +120,6 @@ def execute_sql(sql: str, conn_id: str = "postgres_default"):
         logger.error(f"Error executing SQL: {e}")
         if conn:
             conn.rollback()
-        raise
-    finally:
-        close_connection(conn, cursor)
-
-def execute_batch_insert(df, schema_name, table_name, batch_size=1000):
-    """
-    Inserts a DataFrame into PostgreSQL using batch insert.
-
-    :param df: Pandas DataFrame containing the data
-    :param table_name: Target PostgreSQL table
-    :param schema_name: Schema name for the table
-    :param batch_size: Number of rows per batch insert
-    """
-    if df.empty:
-        logger.warning("⚠️ The DataFrame is empty. Skipping upload.")
-        return
-
-    try:
-        # Get PostgreSQL connection using PostgresHook
-        conn, cursor = get_postgres_connection()
-
-        # Prepare the columns and values template
-        df['trip_id'] = df.index
-        columns = ",".join(df.columns)
-        values_template = ",".join(["%s"] * len(df.columns))  # Ensure each column gets its own placeholder
-
-        # Construct the insert query dynamically with correct placeholders
-        insert_query = f"""
-                INSERT INTO {schema_name}.{table_name} (
-                    {columns}) 
-                VALUES ({values_template});
-            """
-            
-        logger.info(f"Insert query: {insert_query}")
-        
-
-        # Convert NaN to None for all columns in the DataFrame
-        df = df.where(pd.notna(df), None)
-
-        # Convert DataFrame to list of tuples for insertion
-        data = df.to_records(index=False).tolist()
-
-        # Insert in batches
-        for i in range(0, len(data), batch_size):
-            batch = data[i:i + batch_size]
-            
-            cursor.executemany(insert_query, batch)
-            conn.commit()
-            logger.info(f"Inserted {len(batch)} rows into {schema_name}.{table_name}")
-        logger.info(f"✅ Successfully uploaded DataFrame to {schema_name}.{table_name}")
-
-    except Exception as e:
-        logger.error(f"❌ Error uploading DataFrame to {schema_name}.{table_name}: {e}")
-        if conn:
-            conn.rollback()
-        raise
+        raise 
     finally:
         close_connection(conn, cursor)

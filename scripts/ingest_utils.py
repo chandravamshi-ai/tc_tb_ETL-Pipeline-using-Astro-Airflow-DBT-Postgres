@@ -2,12 +2,13 @@ import pandas as pd
 import logging
 from io import StringIO
 from scripts.db_utils import execute_sql, execute_batch_insert
+from scripts.config import DB_DEFAULT_CONN_ID
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 
-def download_and_load_csv(csv_url: str, raw_schema: str, raw_table: str, conn_id: str = "postgres_default"):
+def download_and_load_csv(csv_url: str, raw_schema: str, raw_table: str, conn_id: str = DB_DEFAULT_CONN_ID):
     """
     Downloads a CSV file from a URL and loads it into Postgres using COPY.
     Uses db_utils to handle all database operations.
@@ -60,7 +61,7 @@ def download_and_load_csv(csv_url: str, raw_schema: str, raw_table: str, conn_id
         logger.info(f"Table {raw_schema}.{raw_table} created successfully.")
 
         logger.info(f"Loading data into {raw_schema}.{raw_table}...")
-        execute_batch_insert(df, raw_schema, raw_table, 1000)
+        execute_batch_insert(df, raw_schema, raw_table)
         logger.info(f"Data successfully loaded into {raw_schema}.{raw_table}.")
 
     except Exception as e:

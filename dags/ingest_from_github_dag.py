@@ -15,7 +15,8 @@ from airflow.operators.python import PythonOperator
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 from datetime import datetime
 from scripts.ingest_utils import download_and_load_csv
-from scripts.config import RAW_SCHEMA, RAW_TABLE, CSV_URL
+from scripts.config import RAW_SCHEMA, RAW_TABLE, CSV_URL, DB_DEFAULT_CONN_ID
+
 
 # Define default_args 
 default_args = {
@@ -48,7 +49,7 @@ with DAG(
             "csv_url": CSV_URL,
             "raw_schema": RAW_SCHEMA,
             "raw_table": RAW_TABLE,
-            "conn_id": "postgres_default",
+            "conn_id": DB_DEFAULT_CONN_ID,
         },
     )
 

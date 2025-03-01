@@ -13,14 +13,14 @@ from datetime import datetime
 from airflow.operators.bash import BashOperator
 from cosmos import DbtDag, ProjectConfig, ProfileConfig, ExecutionConfig
 from cosmos.profiles import PostgresUserPasswordProfileMapping
-from scripts.config import DBT_PROJECT_DIR, DBT_EXECUTABLE, DBT_PROFILES_DIR,TRANSFORMED_SCHEMA
+from scripts.config import DBT_PROJECT_DIR, DBT_EXECUTABLE, DBT_PROFILES_DIR,TRANSFORMED_SCHEMA ,DB_DEFAULT_CONN_ID
 
 # DBT Profile Configuration
 profile_config = ProfileConfig(
     profile_name="uber_dbt_project",
     target_name="dev",
     profile_mapping=PostgresUserPasswordProfileMapping(
-        conn_id="postgres_default",
+        conn_id=DB_DEFAULT_CONN_ID,
         profile_args={"schema": TRANSFORMED_SCHEMA},
     ),
 )
@@ -28,7 +28,7 @@ profile_config = ProfileConfig(
 # Define default arguments for the DAG
 default_args = {
     "owner": "airflow",
-    "start_date": datetime(2023, 1, 1),
+    "start_date": datetime(2025, 1, 1),
     "retries": 2, 
 }
 
