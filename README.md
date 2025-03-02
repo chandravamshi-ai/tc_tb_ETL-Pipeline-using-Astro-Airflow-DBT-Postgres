@@ -5,6 +5,8 @@ This project demonstrates an end-to-end data pipeline for ingesting and transfor
 - **Airflow** (via [Astronomer Cosmos](https://docs.astronomer.io/astro/cloud/cosmos)) to orchestrate data ingestion and transformation.
 - **PostgreSQL** as the data warehouse (with separate schemas for raw and transformed data).
 - **dbt** for data modeling, testing, and documentation.
+  
+![ETL Img](https://github.com/chandravamshi-ai/tc_tb_ETL-Pipeline-using-Astro-Airflow-DBT-Postgres/blob/main/imgs/etlflow.png)
 
 ## Data Sources
 - **Official NYC TLC Trip Record Data**: [NYC TLC Website](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page)  
