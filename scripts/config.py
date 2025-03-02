@@ -2,7 +2,9 @@
 Configuration file for database connection and data source.
 """
 
-
+# -----------------------------------------------------------------------------
+# Database Configuration
+# -----------------------------------------------------------------------------
 DB_DEFAULT_CONN_ID = "postgres_default"
 # -----------------------------------------------------------------------------
 # Extract-Transform-Load Configuration

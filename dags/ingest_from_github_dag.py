@@ -31,6 +31,7 @@ with DAG(
     default_args=default_args,  
     schedule_interval="@daily",  
     catchup=False,  
+    max_active_runs=1,
     description="Ingest Uber dataset from GitHub and load into Postgres",
 ) as dag:
     
